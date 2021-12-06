@@ -2,6 +2,7 @@
 //This class is written mainly for string data types.
 public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 	private int collisionCount;
+	protected DIBHashNode<K,V>[] table;
 	public DIBHashTable() {
 		super();
 	}
@@ -23,17 +24,17 @@ public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 		return collisionCount;
 	}
 	protected void createTable() {
-		table = (HashNode<K,V>[]) new HashNode[size];
+		table = (DIBHashNode<K,V>[]) new DIBHashNode[size];
 	}
 	
-	protected HashNode<K,V> get(K k) {//Searches the given key in the hash table. 
+	protected DIBHashNode<K,V> get(K k) {//Searches the given key in the hash table. 
 									  //If the key is not in the table returns a hash node object with null values.
 		int key = getKey(k);//Finds the key integer of the given key
 		int index = key % size;
 		if (index < 0) {//There might be a overflow
 			index += size;
 		}
-		HashNode<K,V> node = table[index];
+		DIBHashNode<K,V> node = table[index];
 		while (!(node == null)) {//Searches the key in the table till finding it or when it encounters an empty space
 								//or when it reaches the end of the table
 			if (node.getkey().equals(k)) {
@@ -58,12 +59,12 @@ public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 		}
 	}
 	protected void setCount(int count, K k) {//For rearranging counts after resize function
-		HashNode<K,V> arrayNode = get(k);
+		DIBHashNode<K,V> arrayNode = get(k);
 		arrayNode.setCount(count);
 	}
 	protected void put(K k, V v) {//inserts the given key in table
-		HashNode<K,V> arrayNode = get(k);
-		HashNode<K,V> node = new HashNode<K,V>(k,v);
+		DIBHashNode<K,V> arrayNode = get(k);
+		DIBHashNode<K,V> node = new DIBHashNode<K,V>(k,v);
 		boolean resize = false;//Program might have called the resize function while trying to insert the node
 								//so that node has to be inserted to the table again. This is used for checking that
 		if (arrayNode == null) {
@@ -84,8 +85,8 @@ public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 					if (table[index].getDistanceFromOriginal() < node.getDistanceFromOriginal()) {
 						//When the node that is inserted in table has lower DIB than the node that has already
 						//inserted it changes the nodes and tries to insert the other one.
-						HashNode<K,V> tempNode = table[index];
-						table[index] = new HashNode<K,V>(node.getkey(), node.getcontent(), node.getCount(), node.getDistanceFromOriginal());
+						DIBHashNode<K,V> tempNode = table[index];
+						table[index] = new DIBHashNode<K,V>(node.getkey(), node.getcontent(), node.getCount(), node.getDistanceFromOriginal());
 						node = tempNode;
 					}
 					index++;
@@ -107,7 +108,7 @@ public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 		if (resize) {//When the key could not be inserted because it reached the end of the table and forced to call
 					//the resize function it tries to insert the key in table again
 			put(node.getkey(),node.getcontent());
-			HashNode<K,V> resizeNode = get(node.getkey());
+			DIBHashNode<K,V> resizeNode = get(node.getkey());
 			resizeNode.setCount(node.getCount());
 		}
 		double db = (double) n / size;
@@ -121,7 +122,7 @@ public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 		//index 4 is time passed for searching in nanoseconds
 		Object[] values = new Object[5];
 		long startTime = System.nanoTime();
-		HashNode<K,V> node = get(k);
+		DIBHashNode<K,V> node = get(k);
 		long endTime = System.nanoTime();
 		values[4] = endTime - startTime; 
 		values[0] = k;
@@ -142,7 +143,7 @@ public class DIBHashTable<K,V> extends AbstractHashTable<K,V> {
 		return values;
 	}
 	public void resize() {
-		HashNode<K,V>[] buffer = (HashNode<K,V>[]) new HashNode[size]; 
+		DIBHashNode<K,V>[] buffer = (DIBHashNode<K,V>[]) new DIBHashNode[size]; 
 		for (int i = 0; i < buffer.length; i++) {
 			buffer[i] = table[i];
 		}
